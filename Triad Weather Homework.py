@@ -1,13 +1,14 @@
 import pandas as pd
+import requests
 
 def clean_numeric_value(value):
     """Removes special characters like '*' and converts to float."""
     return float(value.replace('*', '')) if '*' in value else float(value)
 
-def load_and_clean_data(file_path):
-    """Loads data from a file, handles missing/invalid values, and returns a cleaned DataFrame."""
-    with open(file_path, "r") as file:
-        lines = file.readlines()
+def load_and_clean_data(file_url):
+    """Loads data from a GitHub raw file URL, handles missing/invalid values, and returns a cleaned DataFrame."""
+    response = requests.get(file_url)
+    lines = response.text.splitlines()
 
     data = []
     for line in lines:
@@ -43,8 +44,8 @@ def find_extremes(df):
     return (highest_max_row["Day"], highest_max_row["MaxTemp"]), (lowest_min_row["Day"], lowest_min_row["MinTemp"])
 
 if __name__ == "__main__":
-    file_path = "/Users/Matthew/Documents/Jobs/Potential/weather.dat"  # Update this path if needed
-    df_cleaned = load_and_clean_data(file_path)
+    file_url = "https://raw.githubusercontent.com/mhedge/TriadWeatherHomework/main/weather.dat"  # Replace with your actual GitHub raw URL
+    df_cleaned = load_and_clean_data(file_url)
 
     if df_cleaned.empty:
         print("Error: No valid weather data found in the file.")
